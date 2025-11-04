@@ -11,6 +11,7 @@ import Error from "@/components/ui/Error"
 import Empty from "@/components/ui/Empty"
 import ApperIcon from "@/components/ApperIcon"
 import ContactDetailModal from "@/components/organisms/ContactDetailModal"
+import QuickAddModal from "@/components/organisms/QuickAddModal"
 import { contactService } from "@/services/api/contactService"
 import { toast } from "react-toastify"
 
@@ -22,8 +23,8 @@ const Contacts = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedContact, setSelectedContact] = useState(null)
-  const [showContactModal, setShowContactModal] = useState(false)
-
+const [showContactModal, setShowContactModal] = useState(false)
+  const [showQuickAddModal, setShowQuickAddModal] = useState(false)
   const loadContacts = async () => {
     try {
       setError("")
@@ -86,6 +87,15 @@ const Contacts = () => {
       toast.error("Failed to delete contact")
     }
   }
+const handleOpenModal = () => {
+    setShowQuickAddModal(true)
+  }
+
+  const handleCloseModal = async () => {
+    setShowQuickAddModal(false)
+    // Refresh contacts data after modal closes
+    await loadContacts()
+  }
 
   const getStatusVariant = (status) => {
     const variants = {
@@ -115,7 +125,7 @@ const Contacts = () => {
           <Button icon="Download" variant="secondary" size="sm">
             Export
           </Button>
-          <Button icon="UserPlus" size="sm">
+<Button icon="UserPlus" size="sm" onClick={handleOpenModal}>
             Add Contact
           </Button>
         </div>
@@ -171,8 +181,8 @@ const Contacts = () => {
           title="No contacts found"
           description="No contacts match your current filters. Try adjusting your search criteria."
           icon="Users"
-          actionLabel="Add Contact"
-          onAction={() => toast.info("Add contact functionality would open here")}
+actionLabel="Add Contact"
+          onAction={handleOpenModal}
         />
       ) : (
         <div className="bg-white rounded-xl shadow-sm border border-secondary-200 overflow-hidden">
@@ -300,6 +310,10 @@ const Contacts = () => {
         }}
         onUpdate={handleContactUpdate}
         onDelete={handleContactDelete}
+      />
+<QuickAddModal 
+        isOpen={showQuickAddModal}
+        onClose={handleCloseModal}
       />
     </div>
   )
