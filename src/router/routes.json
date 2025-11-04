@@ -1,0 +1,98 @@
+{
+  "/": {
+    "allow": {
+      "when": {
+        "conditions": [
+          {
+            "label": "Dashboard is accessible to authenticated users",
+            "rule": "authenticated"
+          }
+        ]
+      }
+    }
+  },
+  "/login": {
+    "allow": {
+      "when": {
+        "conditions": [
+          {
+            "label": "Login page is public",
+            "rule": "public"
+          }
+        ]
+      }
+    }
+  },
+  "/signup": {
+    "allow": {
+      "when": {
+        "conditions": [
+          {
+            "label": "Signup page is public",
+            "rule": "public"
+          }
+        ]
+      }
+    }
+  },
+  "/callback": {
+    "allow": {
+      "when": {
+        "conditions": [
+          {
+            "label": "Callback page is public",
+            "rule": "public"
+          }
+        ]
+      }
+    }
+  },
+  "/contacts": {
+    "allow": {
+      "when": {
+        "conditions": [
+          {
+            "label": "Contacts require authentication",
+            "rule": "authenticated"
+          }
+        ]
+      }
+    }
+  },
+  "/deals": {
+    "allow": {
+      "when": {
+        "conditions": [
+          {
+            "label": "Deals require authentication",
+            "rule": "authenticated"
+          }
+        ]
+      }
+    }
+  },
+  "/tasks": {
+    "allow": {
+      "when": {
+        "conditions": [
+          {
+            "label": "Tasks require authentication",
+            "rule": "authenticated"
+          }
+        ]
+      }
+    }
+  },
+  "/activities": {
+    "allow": {
+      "when": {
+        "conditions": [
+          {
+            "label": "Activities require authentication",
+            "rule": "authenticated"
+          }
+        ]
+      }
+    }
+  }
+}

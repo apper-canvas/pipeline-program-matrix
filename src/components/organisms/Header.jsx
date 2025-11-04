@@ -1,36 +1,55 @@
-import { useState } from "react"
-import ApperIcon from "@/components/ApperIcon"
-import SearchBar from "@/components/molecules/SearchBar"
-import Button from "@/components/atoms/Button"
+import React, { useState } from "react";
+import { useAuth } from "@/layouts/Root";
+import { useSelector } from "react-redux";
+import ApperIcon from "@/components/ApperIcon";
+import Button from "@/components/atoms/Button";
+import Input from "@/components/atoms/Input";
+import SearchBar from "@/components/molecules/SearchBar";
 
 const Header = ({ onMenuClick, onQuickAdd }) => {
-  const [showNotifications, setShowNotifications] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const { logout } = useAuth()
+  const { user } = useSelector(state => state.user)
 
-  const notifications = [
-    { id: 1, message: "New deal: Acme Corp - $50,000", type: "deal" },
-    { id: 2, message: "Task overdue: Follow up with John Smith", type: "task" },
-    { id: 3, message: "Meeting in 30 minutes with Jane Doe", type: "meeting" }
-  ]
+  const getUserInitials = () => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase()
+    }
+    return user?.emailAddress?.charAt(0).toUpperCase() || "U"
+  }
+
+  const getUserName = () => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName} ${user.lastName}`
+    }
+    return user?.emailAddress || "User"
+  }
 
   return (
-    <header className="bg-white border-b border-secondary-200 px-4 py-3 lg:px-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={onMenuClick}
-            className="lg:hidden p-2 hover:bg-secondary-100 rounded-lg transition-colors"
-          >
-            <ApperIcon name="Menu" className="h-5 w-5 text-secondary-600" />
-          </button>
-          
-          <div className="hidden sm:block flex-1 max-w-lg">
-            <SearchBar
-              placeholder="Search contacts, deals, tasks..."
-              className="w-full"
+    <header className="bg-white border-b border-secondary-200 px-4 py-3 flex items-center justify-between">
+      <div className="flex items-center space-x-4">
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden p-2 text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100 rounded-md transition-colors"
+        >
+          <ApperIcon name="Menu" size={20} />
+        </button>
+        
+        <div className="hidden sm:flex items-center space-x-3 min-w-0 flex-1 max-w-md">
+          <div className="relative flex-1">
+            <Input
+              type="text"
+              placeholder="Search anything..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10"
+              icon="Search"
             />
           </div>
         </div>
+      </div>
 
+      <div className="flex items-center space-x-3">
         <div className="flex items-center space-x-3">
           <Button
             onClick={onQuickAdd}
@@ -41,36 +60,39 @@ const Header = ({ onMenuClick, onQuickAdd }) => {
           >
             Quick Add
           </Button>
-
-          <div className="relative">
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="p-2 hover:bg-secondary-100 rounded-lg transition-colors relative"
-            >
-              <ApperIcon name="Bell" className="h-5 w-5 text-secondary-600" />
-              <span className="absolute top-1 right-1 h-2 w-2 bg-danger-500 rounded-full"></span>
-            </button>
-
-            {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-secondary-200 z-50">
-                <div className="p-4 border-b border-secondary-200">
-                  <h3 className="text-sm font-medium text-secondary-900">Notifications</h3>
-                </div>
-                <div className="max-h-64 overflow-y-auto">
-                  {notifications.map((notification) => (
-                    <div key={notification.id} className="p-4 border-b border-secondary-100 last:border-b-0 hover:bg-secondary-50">
-                      <p className="text-sm text-secondary-700">{notification.message}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-            <span className="text-white text-sm font-medium">JP</span>
-          </div>
+          
+          <Button
+            onClick={onQuickAdd}
+            variant="primary"
+            size="sm"
+            className="sm:hidden"
+          >
+            <ApperIcon name="Plus" size={16} />
+          </Button>
         </div>
+
+        <div className="flex items-center space-x-2">
+          <button className="p-2 text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100 rounded-full transition-colors">
+            <ApperIcon name="Bell" size={18} />
+          </button>
+          
+          <div className="flex items-center space-x-3 pl-3 border-l border-secondary-200">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+              {getUserInitials()}
+            </div>
+            <div className="hidden lg:block">
+              <div className="text-sm font-medium text-secondary-900">{getUserName()}</div>
+              <div className="text-xs text-secondary-500">User</div>
+            </div>
+            <button 
+              onClick={logout}
+              className="p-2 text-secondary-600 hover:text-danger-600 hover:bg-danger-50 rounded-md transition-colors"
+              title="Logout"
+            >
+              <ApperIcon name="LogOut" size={16} />
+            </button>
+          </div>
+</div>
       </div>
 
       {/* Mobile search */}
