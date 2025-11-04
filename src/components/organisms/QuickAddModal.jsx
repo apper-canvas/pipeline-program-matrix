@@ -431,9 +431,8 @@ className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                 {loading ? "Creating..." : "Create Task"}
               </Button>
             </div>
-          </form>
+</form>
         )}
-)}
 
         {activeTab === "activity" && (
           <form onSubmit={handleSubmit}>
