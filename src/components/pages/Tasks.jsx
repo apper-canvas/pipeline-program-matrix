@@ -8,6 +8,7 @@ import Loading from "@/components/ui/Loading"
 import Error from "@/components/ui/Error"
 import Empty from "@/components/ui/Empty"
 import ApperIcon from "@/components/ApperIcon"
+import QuickAddModal from "@/components/organisms/QuickAddModal"
 import { taskService } from "@/services/api/taskService"
 import { contactService } from "@/services/api/contactService"
 import { format, isToday, isPast, isTomorrow } from "date-fns"
@@ -20,8 +21,9 @@ const Tasks = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [filterStatus, setFilterStatus] = useState("all")
-  const [filterPriority, setFilterPriority] = useState("all")
+const [filterPriority, setFilterPriority] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
+  const [showQuickAdd, setShowQuickAdd] = useState(false)
 
   const loadTasks = async () => {
     try {
@@ -245,7 +247,7 @@ const Tasks = () => {
           <Button icon="Calendar" variant="secondary" size="sm">
             Calendar View
           </Button>
-          <Button icon="Plus" size="sm">
+<Button icon="Plus" size="sm" onClick={() => setShowQuickAdd(true)}>
             Add Task
           </Button>
         </div>
@@ -352,8 +354,15 @@ const Tasks = () => {
             {renderTaskGroup("Upcoming", groupedTasks.upcoming, "primary")}
             {renderTaskGroup("Completed", groupedTasks.completed, "success")}
           </>
-        )}
+)}
       </div>
+      
+      <QuickAddModal 
+        isOpen={showQuickAdd}
+        onClose={() => setShowQuickAdd(false)}
+        defaultTab="task"
+        onTaskCreated={loadTasks}
+      />
     </div>
   )
 }
