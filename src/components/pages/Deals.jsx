@@ -1,25 +1,27 @@
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import Button from "@/components/atoms/Button"
-import Badge from "@/components/atoms/Badge"
-import Loading from "@/components/ui/Loading"
-import Error from "@/components/ui/Error"
-import Empty from "@/components/ui/Empty"
-import ApperIcon from "@/components/ApperIcon"
-import DealCard from "@/components/organisms/DealCard"
-import DealDetailModal from "@/components/organisms/DealDetailModal"
-import { dealService } from "@/services/api/dealService"
-import { contactService } from "@/services/api/contactService"
-import { toast } from "react-toastify"
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { dealService } from "@/services/api/dealService";
+import { contactService } from "@/services/api/contactService";
+import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
+import Badge from "@/components/atoms/Badge";
+import Button from "@/components/atoms/Button";
+import QuickAddModal from "@/components/organisms/QuickAddModal";
+import DealDetailModal from "@/components/organisms/DealDetailModal";
+import DealCard from "@/components/organisms/DealCard";
+import Loading from "@/components/ui/Loading";
+import Empty from "@/components/ui/Empty";
+import Error from "@/components/ui/Error";
 
 const Deals = () => {
   const [deals, setDeals] = useState([])
   const [contacts, setContacts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const [viewMode, setViewMode] = useState("kanban") // kanban or list
+const [viewMode, setViewMode] = useState("kanban") // kanban or list
   const [selectedDeal, setSelectedDeal] = useState(null)
   const [showDealModal, setShowDealModal] = useState(false)
+  const [showQuickAddModal, setShowQuickAddModal] = useState(false)
   const [draggedDeal, setDraggedDeal] = useState(null)
 
   const stages = [
@@ -317,8 +319,12 @@ const Deals = () => {
               <ApperIcon name="List" className="h-4 w-4 mr-2 inline" />
               List
             </button>
-          </div>
-          <Button icon="Plus" size="sm">
+</div>
+          <Button 
+            icon="Plus" 
+            size="sm"
+            onClick={() => setShowQuickAddModal(true)}
+          >
             Add Deal
           </Button>
         </div>
@@ -337,7 +343,16 @@ const Deals = () => {
           setSelectedDeal(null)
         }}
         onUpdate={handleDealUpdate}
-        onDelete={handleDealDelete}
+onDelete={handleDealDelete}
+      />
+
+{/* Quick Add Modal */}
+      <QuickAddModal
+        isOpen={showQuickAddModal}
+        onClose={() => {
+          setShowQuickAddModal(false)
+          loadDeals() // Refresh deals list after creation
+        }}
       />
     </div>
   )
