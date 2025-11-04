@@ -113,10 +113,11 @@ const [viewMode, setViewMode] = useState("kanban") // kanban or list
     }).format(amount)
   }
 
-  const getContactName = (contactId) => {
-    const contact = contacts.find(c => c.Id.toString() === contactId.toString())
-    return contact ? `${contact.firstName} ${contact.lastName}` : "Unknown"
-  }
+const getContactName = (contactId) => {
+  if (!contactId) return "Unknown"
+  const contact = contacts.find(c => c.Id?.toString() === contactId?.toString())
+  return contact ? `${contact.firstName} ${contact.lastName}` : "Unknown"
+}
 
   const renderKanbanView = () => {
     if (deals.length === 0) {
@@ -335,9 +336,9 @@ const [viewMode, setViewMode] = useState("kanban") // kanban or list
 
       {/* Deal Detail Modal */}
       <DealDetailModal
-        deal={selectedDeal}
-        contact={selectedDeal ? contacts.find(c => c.Id.toString() === selectedDeal.contactId.toString()) : null}
-        isOpen={showDealModal}
+deal={selectedDeal}
+      contact={selectedDeal?.contactId ? contacts.find(c => c.Id?.toString() === selectedDeal.contactId?.toString()) : null}
+      isOpen={showDealModal}
         onClose={() => {
           setShowDealModal(false)
           setSelectedDeal(null)
