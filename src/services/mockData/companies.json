@@ -1,0 +1,56 @@
+[
+  {
+    "Id": 1,
+    "name": "Acme Corporation",
+    "industry": "Technology",
+    "size": "500+",
+    "website": "https://acmecorp.com",
+    "address": "123 Tech Drive, San Francisco, CA 94105",
+    "notes": "Enterprise client with multiple departments interested in our platform solutions."
+  },
+  {
+    "Id": 2,
+    "name": "TechStart",
+    "industry": "SaaS",
+    "size": "50-100",
+    "website": "https://techstart.io",
+    "address": "456 Startup Ave, Austin, TX 78701",
+    "notes": "Growing startup looking for marketing automation to scale their operations."
+  },
+  {
+    "Id": 3,
+    "name": "Global Inc",
+    "industry": "Manufacturing",
+    "size": "1000+",
+    "website": "https://globalinc.com",
+    "address": "789 Industrial Blvd, Detroit, MI 48201",
+    "notes": "Large manufacturing company seeking to modernize their sales processes."
+  },
+  {
+    "Id": 4,
+    "name": "Innovate Solutions",
+    "industry": "Software",
+    "size": "200-500",
+    "website": "https://innovate.com",
+    "address": "321 Innovation Way, Seattle, WA 98101",
+    "notes": "Product-focused company with strong technical team but budget constraints."
+  },
+  {
+    "Id": 5,
+    "name": "FinTech Co",
+    "industry": "Financial Services",
+    "size": "100-200",
+    "website": "https://fintech.co",
+    "address": "654 Finance St, New York, NY 10001",
+    "notes": "Financial technology company requiring secure integration solutions."
+  },
+  {
+    "Id": 6,
+    "name": "Retail Plus",
+    "industry": "Retail",
+    "size": "300-500",
+    "website": "https://retailplus.com",
+    "address": "987 Commerce Rd, Chicago, IL 60601",
+    "notes": "Retail chain looking to improve customer analytics and operational efficiency."
+  }
+]
