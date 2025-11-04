@@ -4,19 +4,20 @@ import { toast } from "react-toastify";
 import { contactService } from "@/services/api/contactService";
 import { dealService } from "@/services/api/dealService";
 import { taskService } from "@/services/api/taskService";
+import { activityService } from "@/services/api/activityService";
 import ApperIcon from "@/components/ApperIcon";
 import Select from "@/components/atoms/Select";
 import Button from "@/components/atoms/Button";
 import Input from "@/components/atoms/Input";
 import Loading from "@/components/ui/Loading";
 import FormField from "@/components/molecules/FormField";
-
 const QuickAddModal = ({ isOpen, onClose, defaultTab = "contact", onTaskCreated }) => {
-  const [activeTab, setActiveTab] = useState(defaultTab)
+const [activeTab, setActiveTab] = useState(defaultTab)
   const [loading, setLoading] = useState(false)
   
-  // Contacts for assignment
+  // Contacts and deals for assignment
   const [contacts, setContacts] = useState([])
+  const [deals, setDeals] = useState([])
   const [contactsLoading, setContactsLoading] = useState(false)
   const [formData, setFormData] = useState({
     // Contact fields
@@ -36,20 +37,29 @@ const QuickAddModal = ({ isOpen, onClose, defaultTab = "contact", onTaskCreated 
     taskTitle: "",
     description: "",
     dueDate: "",
-    priority: "medium"
+    priority: "medium",
+    
+    // Activity fields
+    activityType: "call",
+    outcome: "completed",
+    activityDescription: "",
+    activityDate: new Date().toISOString().split('T')[0],
+    contactId: "",
+    dealId: ""
   })
 
   const tabs = [
     { id: "contact", label: "Contact", icon: "User" },
     { id: "deal", label: "Deal", icon: "Target" },
-    { id: "task", label: "Task", icon: "CheckSquare" }
+    { id: "task", label: "Task", icon: "CheckSquare" },
+    { id: "activity", label: "Activity", icon: "Activity" }
   ]
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const resetForm = () => {
+const resetForm = () => {
     setFormData({
       firstName: "",
       lastName: "",
@@ -63,7 +73,13 @@ const QuickAddModal = ({ isOpen, onClose, defaultTab = "contact", onTaskCreated 
       taskTitle: "",
       description: "",
       dueDate: "",
-      priority: "medium"
+      priority: "medium",
+      activityType: "call",
+      outcome: "completed",
+      activityDescription: "",
+      activityDate: new Date().toISOString().split('T')[0],
+      contactId: "",
+      dealId: ""
     })
   }
 
@@ -72,7 +88,7 @@ const QuickAddModal = ({ isOpen, onClose, defaultTab = "contact", onTaskCreated 
     setLoading(true)
 
     try {
-      if (activeTab === "contact") {
+if (activeTab === "contact") {
         await contactService.create({
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -114,6 +130,18 @@ const QuickAddModal = ({ isOpen, onClose, defaultTab = "contact", onTaskCreated 
           dealId: null
         })
         toast.success("Task created successfully!")
+      } else if (activeTab === "activity") {
+        await activityService.create({
+          type: formData.activityType,
+          outcome: formData.outcome,
+          description: formData.activityDescription,
+          date: formData.activityDate,
+          contactId: formData.contactId || null,
+          dealId: formData.dealId || null,
+          assignedTo: "John Parker",
+          duration: formData.activityType === "call" ? 30 : null
+        })
+        toast.success("Activity logged successfully!")
       }
 resetForm()
       onClose()
@@ -125,13 +153,22 @@ resetForm()
     }
   }
 
-  // Load contacts for task assignment
+// Load contacts for task and activity assignment
   useEffect(() => {
-    if (isOpen && activeTab === "task") {
+    if (isOpen && (activeTab === "task" || activeTab === "activity")) {
       loadContacts()
+      loadDeals()
     }
   }, [isOpen, activeTab])
 
+  const loadDeals = async () => {
+    try {
+      const dealsData = await dealService.getAll()
+      setDeals(dealsData)
+    } catch (error) {
+      console.error("Failed to load deals:", error)
+    }
+  }
   const loadContacts = async () => {
     try {
       setContactsLoading(true)
@@ -177,7 +214,7 @@ resetForm()
             Contact
           </button>
           <button
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
               activeTab === "task"
                 ? "bg-white text-primary-600 shadow-sm"
                 : "text-secondary-600"
@@ -185,6 +222,16 @@ resetForm()
             onClick={() => setActiveTab("task")}
           >
             Task
+          </button>
+          <button
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+              activeTab === "activity"
+                ? "bg-white text-primary-600 shadow-sm"
+                : "text-secondary-600"
+            }`}
+            onClick={() => setActiveTab("activity")}
+          >
+            Activity
           </button>
         </div>
 
@@ -386,9 +433,119 @@ resetForm()
             </div>
           </form>
         )}
+)}
+
+        {activeTab === "activity" && (
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField label="Activity Type" required>
+                  <Select
+                    value={formData.activityType}
+                    onChange={(value) => setFormData(prev => ({ ...prev, activityType: value }))}
+                    options={[
+                      { value: "call", label: "Phone Call" },
+                      { value: "email", label: "Email" },
+                      { value: "meeting", label: "Meeting" },
+                      { value: "demo", label: "Demo" },
+                      { value: "follow_up", label: "Follow Up" },
+                      { value: "other", label: "Other" }
+                    ]}
+                    placeholder="Select activity type"
+                  />
+                </FormField>
+
+                <FormField label="Outcome" required>
+                  <Select
+                    value={formData.outcome}
+                    onChange={(value) => setFormData(prev => ({ ...prev, outcome: value }))}
+                    options={[
+                      { value: "completed", label: "Completed" },
+                      { value: "scheduled", label: "Scheduled" },
+                      { value: "no_answer", label: "No Answer" },
+                      { value: "left_message", label: "Left Message" },
+                      { value: "interested", label: "Interested" },
+                      { value: "not_interested", label: "Not Interested" }
+                    ]}
+                    placeholder="Select outcome"
+                  />
+                </FormField>
+              </div>
+
+              <FormField label="Date" required>
+                <Input
+                  type="date"
+                  value={formData.activityDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, activityDate: e.target.value }))}
+                />
+              </FormField>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField label="Related Contact">
+                  <Select
+                    value={formData.contactId}
+                    onChange={(value) => setFormData(prev => ({ ...prev, contactId: value }))}
+                    options={[
+                      { value: "", label: "No Contact" },
+                      ...contacts.map(contact => ({
+                        value: contact.Id.toString(),
+                        label: `${contact.firstName} ${contact.lastName}`
+                      }))
+                    ]}
+                    placeholder="Select contact"
+                    loading={contactsLoading}
+                  />
+                </FormField>
+
+                <FormField label="Related Deal">
+                  <Select
+                    value={formData.dealId}
+                    onChange={(value) => setFormData(prev => ({ ...prev, dealId: value }))}
+                    options={[
+                      { value: "", label: "No Deal" },
+                      ...deals.map(deal => ({
+                        value: deal.Id.toString(),
+                        label: deal.name
+                      }))
+                    ]}
+                    placeholder="Select deal"
+                  />
+                </FormField>
+              </div>
+
+              <FormField label="Description" required>
+                <textarea
+                  className="w-full px-3 py-2 border border-secondary-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                  rows="4"
+                  value={formData.activityDescription}
+                  onChange={(e) => setFormData(prev => ({ ...prev, activityDescription: e.target.value }))}
+                  placeholder="Describe what happened during this activity..."
+                />
+              </FormField>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={onClose}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1"
+                disabled={loading}
+              >
+                {loading ? "Creating..." : "Create Activity"}
+              </Button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
-)
+  )
 }
 
 export default QuickAddModal

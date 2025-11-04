@@ -1,20 +1,21 @@
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import Button from "@/components/atoms/Button"
-import Select from "@/components/atoms/Select"
-import Badge from "@/components/atoms/Badge"
-import Loading from "@/components/ui/Loading"
-import Error from "@/components/ui/Error"
-import Empty from "@/components/ui/Empty"
-import ApperIcon from "@/components/ApperIcon"
-import { activityService } from "@/services/api/activityService"
-import { contactService } from "@/services/api/contactService"
-import { dealService } from "@/services/api/dealService"
-import { format, isToday, isYesterday } from "date-fns"
-import { toast } from "react-toastify"
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { activityService } from "@/services/api/activityService";
+import { contactService } from "@/services/api/contactService";
+import { dealService } from "@/services/api/dealService";
+import { format, isToday, isYesterday } from "date-fns";
+import { toast } from "react-toastify";
+import ApperIcon from "@/components/ApperIcon";
+import Badge from "@/components/atoms/Badge";
+import Select from "@/components/atoms/Select";
+import Button from "@/components/atoms/Button";
+import QuickAddModal from "@/components/organisms/QuickAddModal";
+import Loading from "@/components/ui/Loading";
+import Empty from "@/components/ui/Empty";
+import Error from "@/components/ui/Error";
 
-const Activities = () => {
-  const [activities, setActivities] = useState([])
+const ActivitiesContent = ({ onOpenModal }) => {
+const [activities, setActivities] = useState([])
   const [contacts, setContacts] = useState([])
   const [deals, setDeals] = useState([])
   const [filteredActivities, setFilteredActivities] = useState([])
@@ -22,8 +23,8 @@ const Activities = () => {
   const [error, setError] = useState("")
   const [filterType, setFilterType] = useState("all")
   const [filterOutcome, setFilterOutcome] = useState("all")
-
-  const loadActivities = async () => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+const loadActivities = async () => {
     try {
       setError("")
       setLoading(true)
@@ -41,6 +42,16 @@ const Activities = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleOpenModal = (tab = 'activity') => {
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    // Reload activities after modal closes to show new activity
+    loadActivities()
   }
 
   useEffect(() => {
@@ -162,7 +173,11 @@ const Activities = () => {
           <Button icon="Download" variant="secondary" size="sm">
             Export
           </Button>
-          <Button icon="Plus" size="sm">
+<Button 
+            icon="Plus" 
+            size="sm"
+            onClick={() => onOpenModal('activity')}
+          >
             Log Activity
           </Button>
         </div>
@@ -231,9 +246,9 @@ const Activities = () => {
         <Empty
           title="No activities found"
           description="No activities match your current filters or there are no activities logged yet."
-          icon="Activity"
+icon="Activity"
           actionLabel="Log Activity"
-          onAction={() => toast.info("Log activity functionality would open here")}
+          onAction={() => handleOpenModal('activity')}
         />
       ) : (
         <div className="space-y-6">
@@ -322,9 +337,30 @@ const Activities = () => {
             </div>
           ))}
         </div>
-      )}
+)}
     </div>
   )
 }
 
-export default Activities
+export default function Activities() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const handleOpenModal = (tab = 'activity') => {
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+  }
+
+  return (
+    <>
+      <ActivitiesContent onOpenModal={handleOpenModal} />
+      <QuickAddModal 
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        defaultTab="activity"
+      />
+    </>
+  )
+}
